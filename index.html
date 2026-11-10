@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101411">
+<meta name="description" content="Tus cinco rutinas personalizadas, calendario de turnos y seguimiento de cargas.">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Fuerza — Mi gimnasio</title>
+<style>
+:root{--bg:#0d110f;--panel:#171e19;--panel2:#202a23;--line:#2d3a31;--txt:#f3f7f3;--muted:#a1afa5;--green:#a7f36b;--green2:#72c83e;--red:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:86px}
+header{padding:24px 18px 14px;background:linear-gradient(135deg,#18231b,#0d110f)}
+.eyebrow{color:var(--green);font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase}
+h1{font-size:27px;margin:5px 0 3px}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0}
+.sub{color:var(--muted);font-size:13px}
+main{max-width:720px;margin:auto;padding:16px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#121814;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom));z-index:5}
+nav button{border:0;background:none;color:var(--muted);font-size:11px;padding:5px;display:grid;gap:4px;justify-items:center}
+nav button.active{color:var(--green)}nav b{font-size:19px}
+.page{display:none}.page.active{display:block}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:16px;margin:12px 0}
+.hero{background:linear-gradient(135deg,#263b29,#17221a);border:1px solid #3c5b3c}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pill{font-size:11px;color:var(--green);background:#263a27;padding:6px 9px;border-radius:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
+.stat{background:var(--panel);border:1px solid var(--line);padding:12px;border-radius:13px}
+.stat strong{display:block;font-size:21px;color:var(--green)}.stat span{font-size:11px;color:var(--muted)}
+button,.btn{cursor:pointer;border:0;border-radius:11px;padding:11px 14px;background:var(--green);color:#101710;font-weight:800}
+button.secondary{background:var(--panel2);color:var(--txt);border:1px solid var(--line)}
+button.small{padding:8px 10px;font-size:12px}
+.daylist{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.shiftgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.shift{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px}.shift strong{display:block;margin-bottom:4px}.shift small{color:var(--muted)}
+.day{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:10px 4px;font-size:12px}
+.day.selected{background:#2b422b;border-color:var(--green);color:var(--green)}
+.exercise{border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0;background:#141a16}.exercise-top{display:grid;grid-template-columns:112px 1fr;gap:12px;align-items:center}.exercise-img{width:100%;height:94px;object-fit:contain;background:#f7f7f7;border-radius:10px;border:1px solid #d5d5d5}.technique{display:none;margin-top:10px;padding:10px;border-radius:10px;background:#202a23;color:#dce8dd;font-size:12px;line-height:1.45}.technique.open{display:block}
+.exercise p{color:var(--muted);font-size:12px;margin:5px 0 10px}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px}
+input,select{width:100%;background:#0e130f;border:1px solid #3a493e;border-radius:9px;padding:10px;color:var(--txt);font:inherit;min-width:0}
+input:focus,select:focus{outline:1px solid var(--green)}
+.exercise .actions{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted)}
+.progressbar{height:8px;background:#303b33;border-radius:10px;overflow:hidden;margin-top:9px}
+.progressbar i{display:block;height:100%;background:var(--green);width:0}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 5px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+.notice{font-size:12px;color:var(--muted);line-height:1.5}
+footer{text-align:center;color:#738078;font-size:10px;padding:15px}
+@media(min-width:600px){main{padding:22px}.exercise{padding:16px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">Tu progreso, entrenamiento a entrenamiento</div><h1>FUERZA <span style="color:var(--green)">●</span></h1><div class="sub">Principiante · 5 días · 75–90 min · Máquinas y pesas</div></header>
+<main>
+<section id="inicio" class="page active">
+ <div class="card hero">
+  <div class="eyebrow">Bienvenido/a</div><h2 style="font-size:23px;margin:7px 0">Hoy toca entrenar 💪</h2>
+  <div class="sub" id="todayLabel">Elige tu día y registra tus cargas.</div>
+  <div style="margin-top:16px"><button onclick="showPage('rutina')">Ver entrenamiento</button></div>
+ </div>
+ <div class="stats">
+  <div class="stat"><strong id="sessionsCount">0</strong><span>Sesiones guardadas</span></div>
+  <div class="stat"><strong id="exerciseCount">0</strong><span>Registros</span></div>
+  <div class="stat"><strong id="bodyWeight">—</strong><span>Peso actual (kg)</span></div>
+ </div>
+ <div class="card"><div class="row"><h3>Tu semana</h3><span class="pill">5 días</span></div><div class="progressbar"><i id="weekBar"></i></div><p class="tiny" id="weekText">0 de 5 días registrados esta semana</p></div>
+ <div class="card"><div class="row"><h3>Tu turno de hoy</h3><span class="pill">Ciclo 6 + 4</span></div><h2 id="shiftToday" style="margin:8px 0">Calculando…</h2><p class="sub" id="shiftTodayDetail"></p><button class="secondary small" onclick="showPage('turnos')">Ver calendario de turnos</button></div>
+ <div class="card"><h3>Último entrenamiento</h3><p class="sub" id="lastSession">Todavía no has guardado ninguno.</p></div>
+</section>
+
+<section id="rutina" class="page">
+ <div class="row"><div><div class="eyebrow">Plan semanal</div><h2>Entrenamientos</h2></div><span class="pill">Principiante–intermedio</span></div>
+ <div class="daylist" id="dayButtons"></div><p class="tiny">Rutinas según tus tablas. Elige el día de entrenamiento que quieras realizar; el calendario de turnos es independiente.</p>
+ <div class="card"><div class="row"><h3 id="dayTitle">Día 1</h3><span class="pill" id="dayFocus"></span></div><p class="notice"><b>Duración objetivo: 75–90 min.</b> Calentamiento 10 min · fuerza 55–65 min · cardio suave opcional 10–15 min · vuelta a la calma 5 min. Descansa 90–120 s en ejercicios grandes y 60–90 s en ejercicios de aislamiento. Elige una carga que te permita completar las repeticiones con técnica correcta y dejando 2–3 repeticiones en reserva.</p><div id="exerciseList"></div>
+ <button style="width:100%;margin-top:8px" onclick="saveSession()">Guardar entrenamiento de hoy</button></div>
+</section>
+
+<section id="turnos" class="page">
+ <div class="eyebrow">Calendario rotativo</div><h2>Mis turnos de trabajo</h2>
+ <div class="card hero"><div class="eyebrow">Inicio de ciclo confirmado</div><h2 style="font-size:23px;margin:7px 0">13 de noviembre de 2026</h2><p class="sub">Dos mañanas · dos tardes · dos noches · cuatro días libres. El ciclo se repite cada 10 días.</p></div>
+ <div class="card"><div class="row"><h3>Turno actual</h3><span class="pill">Ciclo de 10 días</span></div><h2 id="shiftNow" style="margin:10px 0">—</h2><p class="sub" id="shiftDate"></p></div>
+ <div class="card"><h3>Próximos 10 días</h3><div id="shiftCalendar" class="shiftgrid"></div></div>
+ <p class="notice">Los días libres aparecen como descanso laboral; puedes decidir en cuáles entrenar. No se ha supuesto todavía qué turnos prefieres para entrenar.</p>
+</section>
+
+<section id="historial" class="page">
+ <div class="eyebrow">Evolución</div><h2>Historial de cargas</h2>
+ <div class="card"><label for="historyFilter">Filtrar ejercicio</label><select id="historyFilter" onchange="renderHistory()"><option value="">Todos los ejercicios</option></select><div id="historyTable"></div></div>
+ <div class="card"><h3>¿Cómo progresar?</h3><p class="notice">Cuando completes todas las series en el máximo de repeticiones con buena técnica en dos sesiones, aumenta el peso un poco (por ejemplo, el mínimo incremento disponible en tren superior y 2–5 kg en tren inferior, según la máquina). Si pierdes técnica, baja la carga. Anota siempre los kilos reales de la máquina o mancuerna y no compares máquinas distintas como si fueran equivalentes.</p></div>
+</section>
+
+<section id="peso" class="page">
+ <div class="eyebrow">Seguimiento corporal</div><h2>Mi peso</h2>
+ <div class="card"><label for="bodyKg">Peso corporal de hoy (kg)</label><input id="bodyKg" type="number" min="20" max="350" step="0.1" placeholder="Ej. 78.5"><div style="margin-top:10px"><button onclick="saveBodyWeight()">Guardar peso</button></div></div>
+ <div class="card"><h3>Registros</h3><div id="bodyHistory"></div></div>
+</section>
+
+<section id="ajustes" class="page">
+ <div class="eyebrow">Personalización</div><h2>Mi perfil</h2>
+ <div class="card"><label for="goal">Objetivo</label><select id="goal"><option>Definir y ganar músculo</option><option>Ganar masa muscular</option><option>Mejorar fuerza</option></select><label for="level" style="margin-top:12px">Nivel</label><select id="level"><option>Principiante</option><option>Intermedio</option><option>Avanzado</option></select><button style="margin-top:12px" onclick="saveProfile()">Guardar perfil</button></div>
+ <div class="card"><h3>Datos y privacidad</h3><p class="notice">Tus registros se guardan en este dispositivo y navegador. No se envían a ningún servidor. Si borras los datos del navegador, puedes perder el historial.</p><button class="secondary small" onclick="exportData()">Exportar copia de mis datos</button> <button class="secondary small" onclick="resetData()">Borrar todos los datos</button></div>
+</section>
+<footer>FUERZA · Prototipo personal · Consulta con un profesional si tienes lesiones o dudas sobre la técnica.</footer>
+</main>
+<nav>
+ <button class="active" data-page="inicio" onclick="showPage('inicio')"><b>⌂</b>Inicio</button>
+ <button data-page="rutina" onclick="showPage('rutina')"><b>▤</b>Rutina</button>
+ <button data-page="turnos" onclick="showPage('turnos')"><b>▦</b>Turnos</button>
+ <button data-page="historial" onclick="showPage('historial')"><b>↗</b>Cargas</button>
+ <button data-page="peso" onclick="showPage('peso')"><b>⚖</b>Mi peso</button>
+ <button data-page="ajustes" onclick="showPage('ajustes')"><b>⚙</b>Perfil</button>
+</nav>
+<script>
+const plans=[
+ {name:"Día 1",focus:"Pecho",items:[
+  ["Press de banca con barra",4,8,"Pecho","d1_1.webp"],["Press de banca inclinado con mancuernas",4,10,"Pecho","d1_2.webp"],["Press pectoral en máquina sentado (Hammer inclinado)",4,12,"Pecho","d1_3.webp"],["Aperturas en máquina contractora",3,15,"Pecho","d1_4.webp"],["Flexiones de brazos",3,"Al fallo","Pecho","d1_5.webp"]]},
+ {name:"Día 2",focus:"Espalda",items:[
+  ["Dominadas en máquina con rodillas flexionadas",4,10,"Espalda","d2_1.webp"],["Jalón con polea alta agarre neutro",4,12,"Espalda","d2_2.webp"],["Remo alto en máquina Hammer",4,10,"Espalda","d2_3.webp"],["Remo horizontal sentado con polea",4,12,"Espalda","d2_4.webp"],["Pullover con cable-polea de pie",3,15,"Espalda","d2_5.webp"]]},
+ {name:"Día 3",focus:"Pierna",items:[
+  ["Media sentadilla con barra",4,8,"Piernas","d3_1.webp"],["Peso muerto rumano o con piernas estiradas",4,8,"Piernas","d3_2.webp"],["Zancada adelante y rodilla al suelo",3,12,"Piernas","d3_3.webp"],["Curl femoral a una pierna con máquina",3,15,"Piernas","d3_4.webp"],["Extensión de piernas en máquina",3,15,"Piernas","d3_5.webp"],["Aducción de cadera en máquina sentado",3,15,"Piernas","d3_6.webp"]]},
+ {name:"Día 4",focus:"Hombro",items:[
+  ["Press frontal de hombro de pie con barra",4,8,"Hombros","d4_1.webp"],["Press de hombros con mancuernas sentado",4,10,"Hombros","d4_2.webp"],["Elevación lateral con mancuernas sentado en banco",4,12,"Hombros","d4_3.webp"],["Aperturas invertidas con agarre horizontal",3,15,"Hombros","d4_4.webp"],["Remo al cuello horizontal con cuerda",3,15,"Hombros","d4_5.webp"]]},
+ {name:"Día 5",focus:"Brazos",items:[
+  ["Extensión de tríceps con cuerda y cable-polea de pie",4,12,"Tríceps","d5_1.webp"],["Extensión de tríceps con cable-polea de pie",4,15,"Tríceps","d5_2.webp"],["Patada de tríceps con mancuerna, rodilla apoyada",3,12,"Tríceps","d5_3.webp"],["Curl de bíceps alterno de pie con mancuernas y giro",4,10,"Bíceps","d5_4.webp"],["Curl de bíceps alterno con mancuernas de pie agarre tipo martillo",4,12,"Bíceps","d5_5.webp"],["Curl de bíceps a dos manos con cable-polea de pie",3,15,"Bíceps","d5_6.webp"]]}
+];
+const cycleStart="2026-11-13";
+const shiftNames=["Mañana","Mañana","Tarde","Tarde","Noche","Noche","Descanso","Descanso","Descanso","Descanso"];
+
+let data=JSON.parse(localStorage.getItem("fuerzaData")||'{"logs":[],"body":[],"profile":{}}');
+let selectedDay=0;
+const $=id=>document.getElementById(id);
+function persist(){localStorage.setItem("fuerzaData",JSON.stringify(data));renderHome();renderHistory();renderBody();}
+function showPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));if(id==="historial")renderHistory();if(id==="peso")renderBody();if(id==="turnos")renderShifts();}
+function parseDateUTC(s){const [y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d);}
+function shiftForDate(dateObj){const day=Date.UTC(dateObj.getFullYear(),dateObj.getMonth(),dateObj.getDate());const delta=Math.floor((day-parseDateUTC(cycleStart))/86400000);if(delta<0)return {name:"Antes del inicio",idx:-1,cycleDay:0};const idx=delta%10;return {name:shiftNames[idx],idx,cycleDay:idx+1};}
+function fmtDate(d){return d.toLocaleDateString("es-ES",{weekday:"short",day:"numeric",month:"short"});}
+function renderShifts(){const now=new Date(),info=shiftForDate(now);$("shiftToday").textContent=info.name;$("shiftTodayDetail").textContent=`Día ${info.cycleDay} de tu ciclo de 10 días`;
+ $("shiftNow").textContent=info.name;$("shiftDate").textContent=`${fmtDate(now)} · Día ${info.cycleDay} de 10`;
+ const start=new Date(now.getFullYear(),now.getMonth(),now.getDate());$("shiftCalendar").innerHTML=Array.from({length:10},(_,i)=>{const d=new Date(start);d.setDate(start.getDate()+i);const x=shiftForDate(d);const cls=x.name==="Descanso"?"#203327":x.name==="Noche"?"#2b2942":x.name==="Tarde"?"#263746":"#3b3424";return `<div class="shift" style="border-color:${cls}"><strong>${fmtDate(d)}</strong><span class="pill">${x.name}</span><br><small>Día ${x.cycleDay}/10</small></div>`}).join("");}
+function buildRoutine(){
+ const weekdays=["Lun","Mar","Mié","Vie","Sáb"]; $("dayButtons").innerHTML=plans.map((p,i)=>`<button class="day ${i===selectedDay?"selected":""}" onclick="selectDay(${i})">${weekdays[i]}</button>`).join("");
+ const p=plans[selectedDay];$("dayTitle").textContent=p.name;$("dayFocus").textContent=p.focus;
+ $("exerciseList").innerHTML=p.items.map((it,i)=>{const prev=latest(it[0]);return `<div class="exercise"><div class="exercise-top"><img class="exercise-img" src="assets/${it[4]}" alt="Ilustración de ${it[0]}" loading="lazy"><div><h3>${it[0]}</h3><span class="pill">${it[3]}</span><p><b>${it[1]} series × ${it[2]} repeticiones</b>${it[2]==="Al fallo"?" · hasta el fallo técnico": ""}</p><button class="secondary small" type="button" onclick="toggleTechnique(${i})">Ver técnica</button></div></div><div class="technique" id="tech${i}">Movimiento ilustrado de referencia. Realiza el ejercicio de forma controlada, sin rebotes y con un rango cómodo. Mantén la postura estable y detén la serie si aparece dolor. Pide al monitor que revise tu técnica si no conoces el movimiento.</div><div class="fields"><div><label>Peso (kg)</label><input type="number" min="0" step="0.5" id="w${i}" placeholder="${prev?prev.weight:"0"}" value="${prev?prev.weight:""}"></div><div><label>Series hechas</label><input type="number" min="1" max="10" id="s${i}" value="${it[1]}"></div><div><label>Reps por serie</label><input type="text" id="r${i}" placeholder="Ej. ${it[2]==="Al fallo"?"al fallo":it[2]}"></div></div><div class="actions"><span class="tiny">${prev?`Última vez: ${prev.weight} kg · ${prev.date}`:"Sin registros anteriores"}</span></div></div>`}).join("");
+}
+function selectDay(i){selectedDay=i;buildRoutine();}
+function toggleTechnique(i){const el=$("tech"+i);if(el)el.classList.toggle("open");}
+function latest(name){return [...data.logs].reverse().find(x=>x.exercise===name);}
+function saveSession(){
+ const p=plans[selectedDay],date=new Date().toISOString().slice(0,10);let count=0;
+ p.items.forEach((it,i)=>{const weight=parseFloat($("w"+i).value);const sets=parseInt($("s"+i).value)||0;const reps=$("r"+i).value.trim()||(it[2]==="Al fallo"?"Al fallo":String(it[2]));if(Number.isFinite(weight)&&weight>=0&&(sets>0||reps)){data.logs.push({date,day:p.name,exercise:it[0],weight,sets,reps});count++;}});
+ if(!count){alert("Introduce al menos un peso para guardar el entrenamiento.");return;}
+ persist();alert(`¡Guardado! Se han registrado ${count} ejercicios.`);buildRoutine();
+}
+function renderHome(){
+ renderShifts();
+ $("sessionsCount").textContent=new Set(data.logs.map(x=>x.date+"-"+x.day)).size;
+ $("exerciseCount").textContent=data.logs.length;
+ $("bodyWeight").textContent=data.body.length?data.body[data.body.length-1].kg+" kg":"—";
+ const now=new Date(),monday=new Date(now);monday.setDate(now.getDate()-((now.getDay()+6)%7));const start=monday.toISOString().slice(0,10);
+ const days=new Set(data.logs.filter(x=>x.date>=start).map(x=>x.date+"-"+x.day)).size;
+ $("weekBar").style.width=Math.min(100,days/5*100)+"%";$("weekText").textContent=`${days} de 5 días registrados esta semana`;
+ const last=data.logs[data.logs.length-1];$("lastSession").textContent=last?`${last.day} · ${last.date} · ${last.exercise}: ${last.weight} kg`:"Todavía no has guardado ninguno.";
+ $("todayLabel").textContent="Plan de cinco días · Elige Rutina para registrar tus cargas.";
+}
+function renderHistory(){
+ const names=[...new Set(data.logs.map(x=>x.exercise))];const sel=$("historyFilter"),old=sel.value;sel.innerHTML='<option value="">Todos los ejercicios</option>'+names.map(n=>`<option>${n}</option>`).join("");sel.value=old;
+ const list=data.logs.filter(x=>!sel.value||x.exercise===sel.value).slice().reverse();
+ $("historyTable").innerHTML=list.length?`<table><thead><tr><th>Fecha</th><th>Ejercicio</th><th>Kg</th><th>Series</th><th>Reps</th></tr></thead><tbody>${list.map(x=>`<tr><td>${x.date}</td><td>${x.exercise}</td><td><b>${x.weight}</b></td><td>${x.sets||"—"}</td><td>${x.reps||"—"}</td></tr>`).join("")}</tbody></table>`:'<div class="empty">Aún no hay cargas guardadas.</div>';
+}
+function saveBodyWeight(){const kg=parseFloat($("bodyKg").value);if(!Number.isFinite(kg)||kg<20||kg>350){alert("Introduce un peso válido en kg.");return;}data.body.push({date:new Date().toISOString().slice(0,10),kg});persist();$("bodyKg").value="";}
+function renderBody(){$("bodyHistory").innerHTML=data.body.length?`<table><thead><tr><th>Fecha</th><th>Peso</th></tr></thead><tbody>${data.body.slice().reverse().map(x=>`<tr><td>${x.date}</td><td>${x.kg} kg</td></tr>`).join("")}</tbody></table>`:'<div class="empty">Todavía no has registrado tu peso.</div>';}
+function saveProfile(){data.profile={goal:$("goal").value,level:$("level").value};persist();alert("Perfil guardado.");}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mis-datos-fuerza.json";a.click();URL.revokeObjectURL(a.href);}
+function resetData(){if(confirm("¿Seguro que quieres borrar todos tus entrenamientos y registros?")){data={logs:[],body:[],profile:{}};persist();buildRoutine();}}
+buildRoutine();renderHome();renderHistory();renderBody();
+if("serviceWorker" in navigator && location.protocol.startsWith("http"))navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body></html>
